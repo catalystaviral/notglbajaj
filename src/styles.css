@@ -1413,7 +1413,7 @@ tbody tr:hover {
   }
 
   tbody tr {
-    grid-template-columns: 72px repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
     border-color: rgba(166, 108, 255, 0.28);
     background:
       linear-gradient(135deg, rgba(166, 108, 255, 0.08), transparent 42%),
@@ -1421,7 +1421,7 @@ tbody tr:hover {
   }
 
   tbody .position {
-    grid-column: 1;
+    grid-column: 1 / 3;
     align-items: flex-start;
     justify-content: center;
     flex-direction: column;
@@ -1431,7 +1431,7 @@ tbody tr:hover {
   }
 
   tbody .student-cell {
-    grid-column: 2 / -1;
+    grid-column: 3 / -1;
     justify-content: center;
     padding: 16px;
     border-top: 0;
@@ -1452,6 +1452,7 @@ tbody tr:hover {
   tbody td:nth-child(4),
   tbody td:nth-child(5),
   tbody td:nth-child(6) {
+    grid-column: span 2;
     min-height: 72px;
     align-items: flex-start;
     flex-direction: column;
@@ -1516,7 +1517,7 @@ tbody tr:hover {
   }
 
   tbody tr {
-    grid-template-columns: 66px repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
   }
 }
 
