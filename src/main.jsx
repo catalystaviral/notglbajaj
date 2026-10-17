@@ -217,12 +217,17 @@ function ResultPage({ students }) {
 }
 
 function Leaderboard({ students }) {
+  const LEADERBOARD_LIMIT = 100;
   const [branch, setBranch] = useState('All');
   const branches = useMemo(
     () => ['All', ...new Set(students.map((student) => student.branch).sort())],
     [students],
   );
   const rows = useMemo(() => ranked(students, branch), [students, branch]);
+  const visibleRows = useMemo(
+    () => rows.slice(0, LEADERBOARD_LIMIT),
+    [rows],
+  );
 
   return (
     <main className="shell">
@@ -266,7 +271,9 @@ function Leaderboard({ students }) {
       <section className="table-card">
         <div className="table-head">
           <h2>{branch === 'All' ? 'Overall standings' : `${branch} standings`}</h2>
-          <span className="count">{rows.length} students</span>
+          <span className="count">
+            Showing top {visibleRows.length} of {rows.length} students
+          </span>
         </div>
         <div className="table-scroll">
           <table>
@@ -281,7 +288,7 @@ function Leaderboard({ students }) {
               </tr>
             </thead>
             <tbody>
-              {rows.map((student) => (
+              {visibleRows.map((student) => (
                 <tr key={student.roll}>
                   <td className="position">#{student.rank}</td>
                   <td className="student-cell">
