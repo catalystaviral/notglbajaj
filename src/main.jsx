@@ -1,53 +1,11 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import Papa from 'papaparse';
-import resultsCsv from '../Assesment - Sheet1 (1).csv?raw';
+import { loadStudents } from "./loadStudents";
 import './styles.css';
 
 const NOT_CONSIDERED = /\[not considered\]/i;
 
-function parseAssessment(value) {
-  const display = value.trim();
-
-  if (!display || display.toUpperCase() === 'ABSENT' || NOT_CONSIDERED.test(display)) {
-    return { display: display || '—', score: 0 };
-  }
-
-  const score = Number(display);
-  return {
-    display,
-    score: Number.isFinite(score) ? score : 0,
-  };
-}
-
-const { data: csvRows, errors: csvErrors } = Papa.parse(resultsCsv, {
-  header: true,
-  skipEmptyLines: true,
-});
-
-if (csvErrors.length) {
-  console.error('Could not parse all scoreboard rows:', csvErrors);
-}
-
-const students = csvRows.map((row) => {
-  const assessment1 = parseAssessment(row.assessment_1);
-  const assessment2 = parseAssessment(row.assessment_2);
-
-  return {
-    roll: row.roll_number.trim(),
-    name: row.full_name.trim(),
-    branch: row.department.trim(),
-    assessment1: assessment1.score,
-    assessment1Display: assessment1.display,
-    assessment2: assessment2.score,
-    assessment2Display: assessment2.display,
-    total: assessment1.score + assessment2.score,
-  };
-});
-
-const branches = ['All', ...new Set(students.map((student) => student.branch).sort())];
-
-function ranked(branch = 'All') {
+function ranked(students, branch = 'All') {
   const rows = students
     .filter((student) => branch === 'All' || student.branch === branch)
     .sort(
@@ -172,7 +130,7 @@ function Header({ page, setPage }) {
   );
 }
 
-function ResultPage() {
+function ResultPage({ students }) {
   const [roll, setRoll] = useState('');
   const [student, setStudent] = useState(null);
   const [error, setError] = useState(false);
@@ -180,10 +138,12 @@ function ResultPage() {
 
   function submit(event) {
     event.preventDefault();
-    const found = ranked().find((row) => row.roll === roll.trim());
+    const found = ranked(students).find((row) => row.roll === roll.trim());
 
     if (found) {
-      const departmentResult = ranked(found.branch).find((row) => row.roll === found.roll);
+      const departmentResult = ranked(students, found.branch).find(
+        (row) => row.roll === found.roll,
+      );
       setStudent({ ...found, departmentRank: departmentResult.rank });
     } else {
       setStudent(null);
@@ -256,9 +216,13 @@ function ResultPage() {
   );
 }
 
-function Leaderboard() {
+function Leaderboard({ students }) {
   const [branch, setBranch] = useState('All');
-  const rows = useMemo(() => ranked(branch), [branch]);
+  const branches = useMemo(
+    () => ['All', ...new Set(students.map((student) => student.branch).sort())],
+    [students],
+  );
+  const rows = useMemo(() => ranked(students, branch), [students, branch]);
 
   return (
     <main className="shell">
@@ -340,12 +304,61 @@ function Leaderboard() {
 
 function App() {
   const [page, setPage] = useState('result');
+  const [students, setStudents] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [dataError, setDataError] = useState('');
+
+  useEffect(() => {
+    let active = true;
+
+    async function fetchStudents() {
+      try {
+        const loadedStudents = await loadStudents();
+        if (active) setStudents(loadedStudents);
+      } catch (error) {
+        console.error('Could not load student results:', error);
+        if (active) {
+          setDataError(
+            error instanceof Error
+              ? error.message
+              : 'Could not load the student results.',
+          );
+        }
+      } finally {
+        if (active) setLoading(false);
+      }
+    }
+
+    fetchStudents();
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   return (
     <>
       <SpaceScene />
       <Header page={page} setPage={setPage} />
-      {page === 'result' ? <ResultPage /> : <Leaderboard />}
+      {loading && (
+        <main className="shell data-state">
+          <span className="eyebrow">Connecting</span>
+          <h1>Loading results…</h1>
+          <p>Fetching the latest assessment data.</p>
+        </main>
+      )}
+      {!loading && dataError && (
+        <main className="shell data-state error-state">
+          <span className="eyebrow">Connection error</span>
+          <h1>Data unavailable.</h1>
+          <p>{dataError}</p>
+        </main>
+      )}
+      {!loading && !dataError && (
+        page === 'result'
+          ? <ResultPage students={students} />
+          : <Leaderboard students={students} />
+      )}
       <footer className="footer">
         made with love by xo
       </footer>

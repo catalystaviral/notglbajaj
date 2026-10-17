@@ -1,6 +1,7 @@
 # Dependencies and generated output
 node_modules/
 dist/
+.vercel/
 
 # Private student data
 /Assesment - Sheet1 (1).csv

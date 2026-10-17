@@ -1,0 +1,8 @@
+.env
+.env.*
+!.env.example
+Assesment - Sheet1 (1).csv
+.openai/
+node_modules/
+dist/
+*.log

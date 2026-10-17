@@ -371,6 +371,31 @@ select {
   text-align: center;
 }
 
+.data-state {
+  min-height: calc(100vh - 170px);
+  padding: 120px 0 80px;
+  text-align: center;
+}
+
+.data-state h1 {
+  margin-bottom: 18px;
+  font-size: clamp(44px, 7vw, 78px);
+}
+
+.data-state p {
+  max-width: 680px;
+  margin: 0 auto;
+  color: var(--muted);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 13px;
+  line-height: 1.7;
+}
+
+.error-state .eyebrow,
+.error-state p {
+  color: var(--danger);
+}
+
 .eyebrow {
   display: inline-flex;
   align-items: center;

@@ -9,7 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "papaparse": "^5.7.0",
+    "@supabase/supabase-js": "^2.118.0",
     "react": "latest",
     "react-dom": "latest"
   },
