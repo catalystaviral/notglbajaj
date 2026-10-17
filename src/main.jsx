@@ -1,30 +1,14 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
-import { loadStudents } from "./loadStudents";
+import {
+  loadDepartments,
+  loadLeaderboard,
+  loadStudentByRoll,
+  PAGE_SIZE,
+} from './loadStudents';
 import './styles.css';
 
 const NOT_CONSIDERED = /\[not considered\]/i;
-
-function ranked(students, branch = 'All') {
-  const rows = students
-    .filter((student) => branch === 'All' || student.branch === branch)
-    .sort(
-      (a, b) =>
-        b.total - a.total ||
-        b.assessment2 - a.assessment2 ||
-        a.name.localeCompare(b.name),
-    );
-
-  let previousTotal = null;
-  let previousRank = 0;
-
-  return rows.map((student, index) => {
-    const rank = student.total === previousTotal ? previousRank : index + 1;
-    previousTotal = student.total;
-    previousRank = rank;
-    return { ...student, rank };
-  });
-}
 
 function getRankMessage(rank) {
   if (rank <= 150) {
@@ -105,6 +89,25 @@ function SpaceScene() {
   );
 }
 
+function LoadingScreen() {
+  return (
+    <main className="loading-screen" role="status" aria-live="polite">
+      <div className="moon-loader" aria-hidden="true">
+        <span className="moon-loader-ring" />
+        <span className="moon-loader-orbit"><i /></span>
+        <span className="moon-loader-body">
+          <i className="moon-crater moon-crater-one" />
+          <i className="moon-crater moon-crater-two" />
+          <i className="moon-crater moon-crater-three" />
+        </span>
+      </div>
+      <span className="loading-label">Connecting to orbit</span>
+      <p>Loading student results<span className="loading-dots" aria-hidden="true">...</span></p>
+      <span className="loading-credit">made with love by xo</span>
+    </main>
+  );
+}
+
 function Header({ page, setPage }) {
   return (
     <header className="shell nav">
@@ -130,26 +133,28 @@ function Header({ page, setPage }) {
   );
 }
 
-function ResultPage({ students }) {
+function ResultPage() {
   const [roll, setRoll] = useState('');
   const [student, setStudent] = useState(null);
-  const [error, setError] = useState(false);
+  const [error, setError] = useState('');
+  const [searching, setSearching] = useState(false);
   const rankMessage = student ? getRankMessage(student.rank) : null;
 
-  function submit(event) {
+  async function submit(event) {
     event.preventDefault();
-    const found = ranked(students).find((row) => row.roll === roll.trim());
+    setSearching(true);
+    setError('');
 
-    if (found) {
-      const departmentResult = ranked(students, found.branch).find(
-        (row) => row.roll === found.roll,
-      );
-      setStudent({ ...found, departmentRank: departmentResult.rank });
-    } else {
+    try {
+      const found = await loadStudentByRoll(roll);
+      setStudent(found);
+      if (!found) setError("We couldn't find that roll number. Check it and try again.");
+    } catch (requestError) {
       setStudent(null);
+      setError(requestError.message || 'Could not load this result. Please try again.');
+    } finally {
+      setSearching(false);
     }
-
-    setError(!found);
   }
 
   return (
@@ -168,10 +173,12 @@ function ResultPage({ students }) {
             placeholder="Enter your roll number"
             required
           />
-          <button className="primary">View my result</button>
+          <button className="primary" disabled={searching}>
+            {searching ? 'Searching…' : 'View my result'}
+          </button>
         </form>
         <p className="helper">Enter the complete university roll number.</p>
-        {error && <p className="error">We couldn't find that roll number. Check it and try again.</p>}
+        {error && <p className="error">{error}</p>}
       </section>
 
       {student && (
@@ -216,18 +223,43 @@ function ResultPage({ students }) {
   );
 }
 
-function Leaderboard({ students }) {
-  const LEADERBOARD_LIMIT = 100;
+function Leaderboard({ branches }) {
   const [branch, setBranch] = useState('All');
-  const branches = useMemo(
-    () => ['All', ...new Set(students.map((student) => student.branch).sort())],
-    [students],
-  );
-  const rows = useMemo(() => ranked(students, branch), [students, branch]);
-  const visibleRows = useMemo(
-    () => rows.slice(0, LEADERBOARD_LIMIT),
-    [rows],
-  );
+  const [page, setPage] = useState(1);
+  const [rows, setRows] = useState([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+
+  useEffect(() => {
+    let active = true;
+    setLoading(true);
+    setError('');
+
+    loadLeaderboard({ branch, page })
+      .then((result) => {
+        if (!active) return;
+        setRows(result.students);
+        setTotal(result.total);
+      })
+      .catch((requestError) => {
+        if (!active) return;
+        setRows([]);
+        setTotal(0);
+        setError(requestError.message || 'Could not load the leaderboard.');
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+
+    return () => { active = false; };
+  }, [branch, page]);
+
+  function changeBranch(event) {
+    setBranch(event.target.value);
+    setPage(1);
+  }
 
   return (
     <main className="shell">
@@ -243,9 +275,9 @@ function Leaderboard({ students }) {
             className="select"
             id="branch"
             value={branch}
-            onChange={(event) => setBranch(event.target.value)}
+            onChange={changeBranch}
           >
-            {branches.map((item) => (
+            {['All', ...branches].map((item) => (
               <option key={item} value={item}>
                 {item === 'All' ? 'All departments' : item}
               </option>
@@ -254,7 +286,7 @@ function Leaderboard({ students }) {
         </div>
       </section>
 
-      <section className="podium">
+      {page === 1 && !loading && !error && <section className="podium">
         {rows.slice(0, 3).map((student, index) => (
           <article
             className={`podium-card ${['first', 'second', 'third'][index]}`}
@@ -266,15 +298,21 @@ function Leaderboard({ students }) {
             <div className="podium-meta">{student.roll} · {student.branch}</div>
           </article>
         ))}
-      </section>
+      </section>}
 
       <section className="table-card">
         <div className="table-head">
           <h2>{branch === 'All' ? 'Overall standings' : `${branch} standings`}</h2>
           <span className="count">
-            Showing top {visibleRows.length} of {rows.length} students
+            {total ? `${(page - 1) * PAGE_SIZE + 1}–${Math.min(page * PAGE_SIZE, total)} of ${total}` : '0 students'}
           </span>
         </div>
+        {loading && <div className="table-status">Loading this page…</div>}
+        {!loading && error && <div className="table-status table-error">{error}</div>}
+        {!loading && !error && rows.length === 0 && (
+          <div className="table-status">No students found for this department.</div>
+        )}
+        {!loading && !error && rows.length > 0 && <>
         <div className="table-scroll">
           <table>
             <thead>
@@ -288,7 +326,7 @@ function Leaderboard({ students }) {
               </tr>
             </thead>
             <tbody>
-              {visibleRows.map((student) => (
+              {rows.map((student) => (
                 <tr key={student.roll}>
                   <td className="position">#{student.rank}</td>
                   <td className="student-cell">
@@ -304,6 +342,13 @@ function Leaderboard({ students }) {
             </tbody>
           </table>
         </div>
+        <div className="pagination" aria-label="Leaderboard pages">
+          <button onClick={() => setPage(1)} disabled={page === 1}>First 100</button>
+          <button onClick={() => setPage((value) => value - 1)} disabled={page === 1}>Previous</button>
+          <span>Page {page} of {totalPages}</span>
+          <button onClick={() => setPage((value) => value + 1)} disabled={page === totalPages}>Next</button>
+        </div>
+        </>}
       </section>
     </main>
   );
@@ -311,64 +356,74 @@ function Leaderboard({ students }) {
 
 function App() {
   const [page, setPage] = useState('result');
-  const [students, setStudents] = useState([]);
+  const [branches, setBranches] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [dataError, setDataError] = useState('');
+  const [dataError, setDataError] = useState(null);
+  const [reloadKey, setReloadKey] = useState(0);
 
   useEffect(() => {
     let active = true;
 
-    async function fetchStudents() {
+    async function connect() {
       try {
-        const loadedStudents = await loadStudents();
-        if (active) setStudents(loadedStudents);
-      } catch (error) {
-        console.error('Could not load student results:', error);
+        const loadedBranches = await loadDepartments();
         if (active) {
-          setDataError(
-            error instanceof Error
-              ? error.message
-              : 'Could not load the student results.',
-          );
+          setBranches(loadedBranches);
+          setDataError(null);
+        }
+      } catch (error) {
+        console.error('Could not connect to the scoreboard:', error);
+        if (active) {
+          setDataError({
+            code: error.code || 'unknown',
+            message: error.message || 'Could not load the student results.',
+          });
         }
       } finally {
         if (active) setLoading(false);
       }
     }
 
-    fetchStudents();
+    connect();
 
     return () => {
       active = false;
     };
-  }, []);
+  }, [reloadKey]);
+
+  const errorTitle = {
+    configuration: 'Deployment not configured.',
+    setup: 'Database setup required.',
+    permission: 'Database access blocked.',
+    network: 'Connection lost.',
+  }[dataError?.code] || 'Data unavailable.';
 
   return (
     <>
       <SpaceScene />
-      <Header page={page} setPage={setPage} />
-      {loading && (
-        <main className="shell data-state">
-          <span className="eyebrow">Connecting</span>
-          <h1>Loading results…</h1>
-          <p>Fetching the latest assessment data.</p>
-        </main>
-      )}
+      {!loading && <Header page={page} setPage={setPage} />}
+      {loading && <LoadingScreen />}
       {!loading && dataError && (
         <main className="shell data-state error-state">
           <span className="eyebrow">Connection error</span>
-          <h1>Data unavailable.</h1>
-          <p>{dataError}</p>
+          <h1>{errorTitle}</h1>
+          <p>{dataError.message}</p>
+          <button className="retry-button" onClick={() => {
+            setLoading(true);
+            setReloadKey((value) => value + 1);
+          }}>Try again</button>
         </main>
       )}
       {!loading && !dataError && (
         page === 'result'
-          ? <ResultPage students={students} />
-          : <Leaderboard students={students} />
+          ? <ResultPage />
+          : <Leaderboard branches={branches} />
       )}
-      <footer className="footer">
-        made with love by xo
-      </footer>
+      {!loading && (
+        <footer className="footer">
+          made with love by xo
+        </footer>
+      )}
     </>
   );
 }

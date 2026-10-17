@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <radialGradient id="space" cx="80%" cy="20%" r="80%"><stop stop-color="#392069"/><stop offset=".6" stop-color="#0b0918"/><stop offset="1" stop-color="#05050b"/></radialGradient>
+    <linearGradient id="chrome" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#fff"/><stop offset=".48" stop-color="#c6b8ff"/><stop offset="1" stop-color="#9dff5c"/></linearGradient>
+    <pattern id="grid" width="38" height="38" patternUnits="userSpaceOnUse"><path d="M38 0H0V38" fill="none" stroke="#7d5cff" stroke-opacity=".12"/></pattern>
+  </defs>
+  <rect width="1200" height="630" fill="url(#space)"/>
+  <rect width="1200" height="630" fill="url(#grid)"/>
+  <circle cx="1015" cy="145" r="170" fill="#7146c0" opacity=".5" stroke="#9dff5c" stroke-opacity=".35"/>
+  <circle cx="964" cy="103" r="25" fill="#2b174d" opacity=".6"/>
+  <circle cx="1070" cy="198" r="39" fill="#2b174d" opacity=".45"/>
+  <g transform="translate(74 68)"><rect width="76" height="76" rx="16" fill="#9dff5c"/><text x="38" y="49" text-anchor="middle" fill="#05050b" font-family="monospace" font-size="29" font-weight="900">XO</text></g>
+  <text x="74" y="265" fill="url(#chrome)" font-family="Arial, sans-serif" font-size="92" font-weight="900">STUDENT</text>
+  <text x="74" y="355" fill="url(#chrome)" font-family="Arial, sans-serif" font-size="92" font-weight="900">SCOREBOARD</text>
+  <text x="78" y="420" fill="#9dff5c" font-family="monospace" font-size="23" letter-spacing="4">RESULTS · RANKS · LEADERBOARD</text>
+  <path d="M75 486H670" stroke="#a66cff" stroke-width="2"/><circle cx="670" cy="486" r="7" fill="#9dff5c"/>
+</svg>

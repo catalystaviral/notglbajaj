@@ -377,6 +377,134 @@ select {
   text-align: center;
 }
 
+.loading-screen {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  min-height: 100vh;
+  place-content: center;
+  justify-items: center;
+  padding: 32px;
+  text-align: center;
+}
+
+.moon-loader {
+  position: relative;
+  width: 150px;
+  height: 150px;
+  margin-bottom: 34px;
+}
+
+.moon-loader-body {
+  position: absolute;
+  inset: 28px;
+  overflow: hidden;
+  border: 1px solid rgba(220, 205, 255, 0.55);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 34% 28%, rgba(255, 255, 255, 0.8), transparent 8%),
+    radial-gradient(circle at 38% 35%, #b9a0ff, #6f46b9 48%, #24123f 78%);
+  box-shadow:
+    inset -17px -13px 25px rgba(4, 3, 12, 0.72),
+    0 0 35px rgba(166, 108, 255, 0.5),
+    0 0 70px rgba(157, 255, 92, 0.12);
+  animation: loader-moon-pulse 2.4s ease-in-out infinite;
+}
+
+.moon-loader-ring {
+  position: absolute;
+  inset: 5px;
+  border: 3px solid rgba(166, 108, 255, 0.16);
+  border-top-color: var(--lime);
+  border-right-color: var(--violet);
+  border-radius: 50%;
+  filter: drop-shadow(0 0 7px rgba(157, 255, 92, 0.7));
+  animation: loader-ring-spin 1.15s linear infinite;
+}
+
+.moon-loader-orbit {
+  position: absolute;
+  inset: 16px -13px;
+  border: 1px solid rgba(166, 108, 255, 0.45);
+  border-radius: 50%;
+  transform: rotate(-22deg);
+  animation: loader-orbit-spin 2.8s linear infinite;
+}
+
+.moon-loader-orbit i {
+  position: absolute;
+  top: 50%;
+  right: -5px;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--lime);
+  box-shadow: 0 0 13px var(--lime);
+}
+
+.moon-crater {
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(28, 13, 55, 0.32);
+  box-shadow: inset 2px 3px 5px rgba(0, 0, 0, 0.32);
+}
+
+.moon-crater-one { top: 22%; left: 24%; width: 15px; height: 15px; }
+.moon-crater-two { right: 19%; bottom: 27%; width: 21px; height: 21px; }
+.moon-crater-three { left: 28%; bottom: 17%; width: 9px; height: 9px; }
+
+.loading-label {
+  color: var(--lime);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.loading-screen p {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 13px;
+}
+
+.loading-credit {
+  position: absolute;
+  right: 0;
+  bottom: 38px;
+  left: 0;
+  color: #747a99;
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 10px;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.loading-dots {
+  display: inline-block;
+  width: 2.2em;
+  overflow: hidden;
+  vertical-align: bottom;
+  animation: loader-dots 1.4s steps(4, end) infinite;
+}
+
+@keyframes loader-ring-spin {
+  to { transform: rotate(360deg); }
+}
+
+@keyframes loader-orbit-spin {
+  to { transform: rotate(338deg); }
+}
+
+@keyframes loader-moon-pulse {
+  50% { transform: scale(1.04); filter: brightness(1.12); }
+}
+
+@keyframes loader-dots {
+  0% { width: 0; }
+}
+
 .data-state h1 {
   margin-bottom: 18px;
   font-size: clamp(44px, 7vw, 78px);
@@ -512,6 +640,13 @@ h1 {
 .primary:hover {
   box-shadow: 0 0 34px rgba(157, 255, 92, 0.36), inset 0 1px rgba(255, 255, 255, 0.8);
   transform: translateY(-2px);
+}
+
+.primary:disabled,
+.pagination button:disabled {
+  cursor: not-allowed;
+  opacity: 0.45;
+  transform: none;
 }
 
 .helper,
@@ -914,6 +1049,48 @@ h1 {
 
 .table-scroll {
   overflow-x: auto;
+}
+
+.table-status {
+  padding: 70px 24px;
+  color: var(--muted);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 12px;
+  text-align: center;
+}
+
+.table-error {
+  color: var(--danger);
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  padding: 18px;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+}
+
+.pagination button,
+.retry-button {
+  padding: 9px 15px;
+  border: 1px solid var(--line-bright);
+  border-radius: 6px;
+  color: var(--cyan);
+  background: rgba(157, 255, 92, 0.06);
+  font-family: Consolas, "Courier New", monospace;
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.retry-button {
+  margin-top: 24px;
 }
 
 table {
