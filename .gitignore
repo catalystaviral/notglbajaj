@@ -1,0 +1,38 @@
+# Dependencies and generated output
+node_modules/
+dist/
+
+# Private student data
+/Assesment - Sheet1 (1).csv
+
+# Environment variables and local configuration
+.env
+.env.*
+!.env.example
+*.local
+
+# Credentials, keys, and certificates
+*.key
+*.pem
+*.p12
+*.pfx
+*.crt
+*.cer
+credentials*.json
+secrets*.json
+.npmrc
+.netrc
+
+# Local databases and logs
+*.db
+*.db-*
+*.sqlite
+*.sqlite3
+*.log
+logs/
+
+# Editor and operating-system files
+.idea/
+.vscode/
+.DS_Store
+Thumbs.db
