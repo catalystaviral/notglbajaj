@@ -1276,6 +1276,248 @@ tbody tr:hover {
   .table-head {
     padding: 18px;
   }
+
+  .table-card {
+    overflow: visible;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .table-card::before {
+    display: none;
+  }
+
+  .table-head {
+    align-items: flex-start;
+    gap: 10px;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    background: rgba(8, 9, 19, 0.9);
+  }
+
+  .table-head h2 {
+    max-width: 60%;
+  }
+
+  .count {
+    text-align: right;
+  }
+
+  .table-scroll {
+    overflow: visible;
+  }
+
+  table,
+  tbody {
+    display: block;
+    min-width: 0;
+    width: 100%;
+  }
+
+  thead {
+    display: none;
+  }
+
+  tbody {
+    display: grid;
+    gap: 12px;
+    margin-top: 12px;
+  }
+
+  tbody tr {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    background: linear-gradient(145deg, rgba(24, 26, 49, 0.92), rgba(8, 9, 18, 0.97));
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.3);
+  }
+
+  tbody tr:hover {
+    box-shadow: 0 14px 35px rgba(0, 0, 0, 0.3);
+  }
+
+  tbody td {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 15px;
+    border-top: 1px solid rgba(161, 171, 255, 0.09);
+    font-size: 13px;
+    text-align: right;
+  }
+
+  tbody td::before {
+    flex: 0 0 auto;
+    color: #8187a7;
+    content: attr(data-label);
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  tbody .position,
+  tbody .student-cell {
+    grid-column: 1 / -1;
+  }
+
+  tbody .position {
+    width: auto;
+    border-top: 0;
+    color: var(--cyan);
+    background: linear-gradient(90deg, rgba(157, 255, 92, 0.09), transparent);
+    font-size: 17px;
+  }
+
+  tbody .student-cell {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 4px;
+    text-align: left;
+  }
+
+  tbody .student-cell::before {
+    margin-bottom: 2px;
+  }
+
+  tbody .student-cell strong {
+    overflow-wrap: anywhere;
+  }
+
+  tbody td:nth-child(4),
+  tbody td:nth-child(6) {
+    border-right: 1px solid rgba(161, 171, 255, 0.09);
+  }
+
+  .pagination {
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 12px;
+    border: 1px solid var(--line);
+    border-radius: 11px;
+    background: rgba(8, 9, 19, 0.9);
+  }
+
+  .pagination span {
+    order: -1;
+    width: 100%;
+    margin-bottom: 4px;
+    text-align: center;
+  }
+
+  tbody tr {
+    grid-template-columns: 72px repeat(2, minmax(0, 1fr));
+    border-color: rgba(166, 108, 255, 0.28);
+    background:
+      linear-gradient(135deg, rgba(166, 108, 255, 0.08), transparent 42%),
+      rgba(9, 10, 21, 0.96);
+  }
+
+  tbody .position {
+    grid-column: 1;
+    align-items: flex-start;
+    justify-content: center;
+    flex-direction: column;
+    padding: 16px;
+    border-right: 1px solid var(--line);
+    background: rgba(157, 255, 92, 0.045);
+  }
+
+  tbody .student-cell {
+    grid-column: 2 / -1;
+    justify-content: center;
+    padding: 16px;
+    border-top: 0;
+  }
+
+  tbody .student-cell strong {
+    font-size: 15px;
+    line-height: 1.25;
+  }
+
+  tbody td:nth-child(3) {
+    grid-column: 1 / -1;
+    min-height: 45px;
+    padding-block: 9px;
+    background: rgba(166, 108, 255, 0.035);
+  }
+
+  tbody td:nth-child(4),
+  tbody td:nth-child(5),
+  tbody td:nth-child(6) {
+    min-height: 72px;
+    align-items: flex-start;
+    flex-direction: column;
+    justify-content: center;
+    gap: 7px;
+    border-right: 1px solid rgba(161, 171, 255, 0.09);
+    text-align: left;
+  }
+
+  tbody td:nth-child(6) {
+    border-right: 0;
+    background: rgba(157, 255, 92, 0.045);
+    font-size: 16px;
+  }
+
+  .branch-pill {
+    padding: 4px 8px;
+  }
+
+  .pagination {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    padding: 12px;
+  }
+
+  .pagination span {
+    grid-column: 1 / -1;
+  }
+
+  .pagination button {
+    width: 100%;
+    padding: 11px 6px;
+  }
+}
+
+@media (max-width: 420px) {
+  .nav-links {
+    gap: 2px;
+    padding: 4px;
+  }
+
+  .nav-link {
+    padding-inline: 8px;
+  }
+
+  .leader-hero h1 {
+    font-size: 49px;
+  }
+
+  .table-head {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .table-head h2 {
+    max-width: none;
+  }
+
+  .count {
+    align-self: flex-start;
+    text-align: left;
+  }
+
+  tbody tr {
+    grid-template-columns: 66px repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

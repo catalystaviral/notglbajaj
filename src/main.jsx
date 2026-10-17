@@ -328,15 +328,15 @@ function Leaderboard({ branches }) {
             <tbody>
               {rows.map((student) => (
                 <tr key={student.roll}>
-                  <td className="position">#{student.rank}</td>
-                  <td className="student-cell">
+                  <td className="position" data-label="Position">#{student.rank}</td>
+                  <td className="student-cell" data-label="Student">
                     <strong>{student.name}</strong>
                     <span>{student.roll}</span>
                   </td>
-                  <td><span className="branch-pill">{student.branch}</span></td>
-                  <td><ScoreValue value={student.assessment1Display} /></td>
-                  <td><ScoreValue value={student.assessment2Display} /></td>
-                  <td className="total-cell">{student.total}</td>
+                  <td data-label="Department"><span className="branch-pill">{student.branch}</span></td>
+                  <td data-label="Assessment 1"><ScoreValue value={student.assessment1Display} /></td>
+                  <td data-label="Assessment 2"><ScoreValue value={student.assessment2Display} /></td>
+                  <td className="total-cell" data-label="Total">{student.total}</td>
                 </tr>
               ))}
             </tbody>
