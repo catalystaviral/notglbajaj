@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
+import { Analytics } from '@vercel/analytics/react';
 import {
   loadDepartments,
   loadLeaderboard,
@@ -424,6 +425,7 @@ function App() {
           made with love by xo
         </footer>
       )}
+      <Analytics />
     </>
   );
 }
